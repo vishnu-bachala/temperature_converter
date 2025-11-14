@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    
+    <!-- Load Inter font (clean, modern font) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* * --- INTERNAL CSS ---
+         * No Tailwind or server needed. This will work in all browsers by default.
+        */
+        
+        /* 1. Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* A light gray background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        /* 2. Main App Card */
+        .app-card {
+            background-color: white;
+            border-radius: 0.75rem; /* 12px */
+            /* A clean shadow like the reference image */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem; /* 24px */
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box; /* Ensures padding doesn't break layout */
+        }
+        
+        @media (min-width: 640px) {
+            .app-card {
+                padding: 2rem; /* 32px on larger screens */
+            }
+        }
+
+        h1 {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 700;
+            text-align: center;
+            color: #111827; /* Black */
+            margin-top: 0;
+            margin-bottom: 1.5rem; /* 24px */
+        }
+        
+        @media (min-width: 640px) {
+             h1 {
+                font-size: 1.875rem; /* 30px on larger screens */
+             }
+        }
+
+
+        /* 3. Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 1rem; /* 16px */
+            margin-bottom: 1.5rem;
+        }
+
+        /* 4. Inputs, Labels, Selects */
+        label {
+            display: block;
+            font-size: 0.875rem; /* 14px */
+            font-weight: 500;
+            color: #374151; /* Dark gray */
+            margin-bottom: 0.25rem;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.75rem; /* 12px */
+            border: 1px solid #d1d5db; /* Gray border */
+            border-radius: 0.375rem; /* 6px */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            box-sizing: border-box; /* Important for inputs */
+            font-size: 1rem;
+        }
+        
+        /* Style for focus */
+        input[type="text"]:focus,
+        select:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #8C1B1B; /* Maroon border on focus */
+            box-shadow: 0 0 0 2px #8C1B1B;
+        }
+
+
+        #error-message {
+            color: #dc2626; /* Red for errors */
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            height: 1rem; /* Give it space so it doesn't jump */
+        }
+
+        /* 5. Result Display */
+        #result-display {
+            width: 100%;
+            height: 80px;
+            background-color: #f9fafb; /* Light gray */
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem; /* 20px */
+            font-weight: 700;
+            color: #6b7280; /* Default gray text */
+            margin-top: 0.25rem;
+            margin-bottom: 1.5rem;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        
+        @media (min-width: 640px) {
+             #result-display {
+                font-size: 1.5rem; /* 24px on larger screens */
+             }
+        }
+        
+        /* Custom class to be added by JavaScript */
+        .text-maroon {
+            color: #8C1B1B;
+        }
+
+        /* 6. Convert Button */
+        .convert-button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #8C1B1B; /* Maroon */
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .convert-button:hover {
+            background-color: #6D1414; /* Darker Maroon */
+        }
+        
+        .convert-button:active {
+            transform: scale(0.98); /* Click effect */
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Main App Card -->
+    <!-- Note: All 'class' attributes are simple and matched to the CSS above -->
+    <div class="app-card">
+        
+        <h1>Temperature Converter</h1>
+
+        <!-- Form wraps all inputs and the button -->
+        <form id="converter-form">
+
+            <!-- Inputs: Degrees and Type (side-by-side) -->
+            <div class="form-grid">
+                <!-- Degrees Input -->
+                <div>
+                    <label for="temperature">Degrees</label>
+                    <input type="text" id="temperature" inputmode="decimal" placeholder="e.g., 72">
+                    <p id="error-message"></p>
+                </div>
+
+                <!-- Unit Type Input -->
+                <div>
+                    <label for="unit">Type</label>
+                    <select id="unit">
+                        <option value="Fahrenheit">Fahrenheit (°F)</option>
+                        <option value="Celsius">Celsius (°C)</option>
+                        <option value="Kelvin">Kelvin (K)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Result Display Area -->
+            <div>
+                <label for="result-display">Result</label>
+                <div id="result-display">---</div>
+            </div>
+
+            <!-- Convert Button -->
+            <button type="submit" class="convert-button">
+                Convert
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // 5. JavaScript Logic (This part is unchanged and will work)
+        const form = document.getElementById('converter-form');
+        const inputField = document.getElementById('temperature');
+        const unitField = document.getElementById('unit');
+        const errorDisplay = document.getElementById('error-message');
+        const resultDisplay = document.getElementById('result-display');
+
+        form.addEventListener('submit', function(event) {
+            // Prevent the form from refreshing the page
+            event.preventDefault(); 
+            
+            // Clear previous errors
+            errorDisplay.textContent = '';
+            
+            // 1. Get and Validate Input
+            const tempValueStr = inputField.value;
+            if (tempValueStr.trim() === '') {
+                errorDisplay.textContent = 'Please enter a value.';
+                return;
+            }
+            
+            const tempValue = parseFloat(tempValueStr);
+            if (isNaN(tempValue)) {
+                errorDisplay.textContent = 'Please enter a valid number.';
+                return;
+            }
+
+            // 2. Get Unit
+            const unit = unitField.value;
+            let resultText = '';
+
+            // 3. Conversion Logic
+            try {
+                if (unit === 'Fahrenheit') {
+                    const celsius = (tempValue - 32) * 5 / 9;
+                    const kelvin = celsius + 273.15;
+                    resultText = `${celsius.toFixed(2)} °C / ${kelvin.toFixed(2)} K`;
+                
+                } else if (unit === 'Celsius') {
+                    const fahrenheit = (tempValue * 9 / 5) + 32;
+                    const kelvin = tempValue + 273.15;
+                    resultText = `${fahrenheit.toFixed(2)} °F / ${kelvin.toFixed(2)} K`;
+                
+                } else if (unit === 'Kelvin') {
+                    const celsius = tempValue - 273.15;
+                    const fahrenheit = (celsius * 9 / 5) + 32;
+                    resultText = `${celsius.toFixed(2)} °C / ${fahrenheit.toFixed(2)} °F`;
+                }
+
+                // 4. Display Result
+                resultDisplay.textContent = resultText;
+                resultDisplay.classList.add('text-maroon'); // Use maroon color for result
+
+            } catch (error) {
+                console.error(error);
+                errorDisplay.textContent = 'An error occurred during conversion.';
+            }
+        });
+    </script>
+
+</body>
+</html>
